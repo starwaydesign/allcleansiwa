@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#050508">
+  <meta name="description" content="Rizky Nur Alief — Graphic Designer, Video Editor & Digital Creator">
+  <title>Rizky Nur Alief · Creative Portfolio</title>
+
+  <style>
+    :root {
+      --bg-primary: #050508;
+      --text-primary: #ffffff;
+      --accent-1: #6366f1;
+      --accent-2: #ec4899;
+      --accent-3: #06b6d4;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg-primary);
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Canvas full-screen */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Overlay teks minimal (optional) */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 32px 20px;
+      z-index: 1;
+      pointer-events: none;
+      text-align: center;
+    }
+
+    .overlay .name {
+      font-size: clamp(1.1rem, 3vw, 1.4rem);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--text-primary);
+      opacity: 0.9;
+      margin-bottom: 4px;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    }
+
+    .overlay .tagline {
+      font-size: clamp(0.7rem, 2vw, 0.82rem);
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.55);
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <div class="overlay" aria-hidden="true">
+    <div class="name">RIZKY NUR ALIEF</div>
+    <div class="tagline">Creative · Design · Video</div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      let scene, camera, renderer, particles;
+      let ready = false;
+      let mouseX = 0, mouseY = 0;
+      let rafId = null;
+      let lastMove = 0;
+
+      function init() {
+        if (typeof THREE === 'undefined') return;
+
+        const canvas = document.getElementById('bg-canvas');
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        renderer = new THREE.WebGLRenderer({
+          canvas,
+          alpha: true,
+          antialias: false,
+          powerPreference: 'low-power'
+        });
+
+        // Batasi devicePixelRatio maksimal 1.5
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        renderer.setPixelRatio(dpr);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const count = 1800;
+        const positions = new Float32Array(count * 3);
+        const colors = new Float32Array(count * 3);
+        const c1 = new THREE.Color('#6366f1');
+        const c2 = new THREE.Color('#ec4899');
+        const c3 = new THREE.Color('#06b6d4');
+
+        for (let i = 0; i < count * 3; i += 3) {
+          positions[i] = (Math.random() - 0.5) * 8;
+          positions[i + 1] = (Math.random() - 0.5) * 8;
+          positions[i + 2] = (Math.random() - 0.5) * 8;
+
+          const r = Math.random();
+          const color = r < 0.33 ? c1 : r < 0.66 ? c2 : c3;
+          colors[i] = color.r;
+          colors[i + 1] = color.g;
+          colors[i + 2] = color.b;
+        }
+
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        const mat = new THREE.PointsMaterial({
+          size: 0.014,
+          vertexColors: true,
+          transparent: true,
+          opacity: 0.65,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          sizeAttenuation: true
+        });
+
+        particles = new THREE.Points(geo, mat);
+        scene.add(particles);
+        camera.position.z = 3;
+
+        // Throttle mousemove ke ~60ms
+        document.addEventListener('mousemove', (e) => {
+          const now = performance.now();
+          if (now - lastMove < 60) return;
+          lastMove = now;
+          mouseX = (e.clientX / window.innerWidth) - 0.5;
+          mouseY = (e.clientY / window.innerHeight) - 0.5;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+          if (!e.touches.length) return;
+          const now = performance.now();
+          if (now - lastMove < 60) return;
+          lastMove = now;
+          mouseX = (e.touches[0].clientX / window.innerWidth) - 0.5;
+          mouseY = (e.touches[0].clientY / window.innerHeight) - 0.5;
+        }, { passive: true });
+
+        window.addEventListener('resize', onResize, { passive: true });
+        ready = true;
+        animate();
+      }
+
+      function onResize() {
+        if (!ready) return;
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }
+
+      let frame = 0;
+      function animate() {
+        rafId = requestAnimationFrame(animate);
+        if (!ready) return;
+
+        // Batasi render ke ~30fps
+        frame++;
+        if (frame % 2 !== 0) return;
+
+        particles.rotation.y += 0.0006;
+        particles.rotation.x += 0.0003;
+
+        // Interpolasi kamera halus
+        camera.position.x += (mouseX * 0.45 - camera.position.x) * 0.04;
+        camera.position.y += (-mouseY * 0.45 - camera.position.y) * 0.04;
+
+        renderer.render(scene, camera);
+      }
+
+      // Bersihkan saat unload
+      window.addEventListener('beforeunload', () => {
+        if (rafId) cancelAnimationFrame(rafId);
+        if (renderer) renderer.dispose();
+      });
+
+      // Tunggu DOM siap
+      if (document.readyState === 'complete') {
+        init();
+      } else {
+        window.addEventListener('load', init, { once: true });
+      }
+    })();
+  </script>
+</body>
+</html>
