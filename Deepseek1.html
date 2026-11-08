@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="description" content="Rizky Nur Alief — Graphic Designer, Video Editor & Digital Creator">
+  <title>Rizky Nur Alief · Creative Portfolio</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  
+  <style>
+    :root {
+      --bg-primary: #050508;
+      --bg-secondary: #0a0a12;
+      --glass-bg: rgba(255, 255, 255, 0.04);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-hover: rgba(255, 255, 255, 0.1);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.75);
+      --text-muted: rgba(255, 255, 255, 0.5);
+      --accent-1: #6366f1;
+      --accent-2: #ec4899;
+      --accent-3: #06b6d4;
+      --accent-gradient: linear-gradient(135deg, #6366f1, #ec4899, #06b6d4);
+      --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+      --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+      --radius-sm: 12px;
+      --radius-md: 20px;
+      --radius-lg: 28px;
+      --radius-xl: 36px;
+      --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: var(--bg-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: var(--text-primary);
+      overflow-x: hidden;
+      position: relative;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Animated gradient orbs */
+    .bg-orbs {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.35;
+      animation: orbFloat 20s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 500px;
+      height: 500px;
+      background: var(--accent-1);
+      top: -10%;
+      left: -10%;
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 400px;
+      height: 400px;
+      background: var(--accent-2);
+      bottom: -15%;
+      right: -10%;
+      animation-delay: -7s;
+    }
+
+    .orb-3 {
+      width: 350px;
+      height: 350px;
+      background: var(--accent-3);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: -14s;
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(30px, -30px) scale(1.1); }
+      50% { transform: translate(-20px, 20px) scale(0.9); }
+      75% { transform: translate(20px, 30px) scale(1.05); }
+    }
+
+    /* Canvas background */
+    #bg-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      display: block;
+      pointer-events: none;
+    }
+
+    /* Noise texture overlay */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* Container */
+    .container {
+      max-width: 680px;
+      width: 100%;
+      position: relative;
+      z-index: 3;
+      perspective: 1200px;
+    }
+
+    /* Cards */
+    .glass-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent 40%, transparent 60%, rgba(255,255,255,0.08));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .glass-card:hover {
+      background: var(--glass-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+      box-shadow: var(--shadow-lg), var(--shadow-glow), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      transform: translateY(-4px);
+    }
+
+    /* Profile Card */
+    .profile-card {
+      padding: 40px 32px;
+      margin-bottom: 24px;
+      text-align: center;
+      animation: cardEntry 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .profile-card:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    @keyframes cardEntry {
+      0% { opacity: 0; transform: translateY(-20px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Profile Image */
+    .profile-image-wrapper {
+      position: relative;
+      width: 150px;
+      height: 150px;
+      margin: 0 auto 24px;
+    }
+
+    .profile-image-ring {
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--accent-1), var(--accent-2), var(--accent-3), var(--accent-1));
+      animation: ringRotate 8s linear infinite;
+      opacity: 0.8;
+    }
+
+    @keyframes ringRotate {
+      to { transform: rotate(360deg); }
+    }
+
+    .profile-image {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 4px solid var(--bg-primary);
+      transition: transform var(--transition);
+      z-index: 1;
+    }
+
+    .profile-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+
+    .profile-image-wrapper:hover .profile-image {
+      transform: scale(1.05);
+    }
+
+    .profile-image-wrapper:hover .profile-image img {
+      transform: scale(1.1);
+    }
+
+    /* Status badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.25);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #4ade80;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #4ade80;
+      animation: pulse 2s ease-in-out infinite;
+      box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    /* Typography */
+    h1, h2, h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    .name-title {
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      font-size: clamp(0.85rem, 2.5vw, 1rem);
+      color: var(--text-muted);
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+    }
+
+    /* Skill tags */
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .skill-tag {
+      padding: 6px 14px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 100px;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #a5b4fc;
+      transition: all var(--transition);
+      cursor: default;
+    }
+
+    .skill-tag:hover {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: rgba(99, 102, 241, 0.4);
+      transform: translateY(-2px);
+    }
+
+    /* Bio section */
+    .bio-card {
+      padding: 32px;
+      margin-bottom: 24px;
+      text-align: left;
+      animation: cardEntry 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+    }
+
+    .bio-section {
+      margin-bottom: 24px;
+    }
+
+    .bio-section:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .bio-heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .bio-heading .icon-wrap {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: rgba(99, 102, 241, 0.12);
+      font-size: 0.85rem;
+      color: #a5b4fc;
+      flex-shrink: 0;
+    }
+
+    .bio-text {
+      color: var(--text-secondary);
+      line-height: 1.75;
+      font-size: 0.92rem;
+      padding-left: 42px;
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+      margin: 20px 0;
+    }
+
+    /* Links */
+    .links-container {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      animation: cardEntry 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+    }
+
+    .link-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      color: var(--text-primary);
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .link-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+      pointer-events: none;
+    }
+
+    .link-card:hover::after {
+      transform: translateX(100%);
+    }
+
+    .link-card:hover {
+      background: var(--glass-hover);
+      border-color: rgba(255, 255, 255, 0.18);
+      transform: translateX(6px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .link-card:active {
+      transform: scale(0.98) translateX(4px);
+    }
+
+    .link-icon {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      transition: all var(--transition);
+      position: relative;
+    }
+
+    .link-card:hover .link-icon {
+      transform: scale(1.1) rotate(-5deg);
+    }
+
+    .link-icon.instagram { background: linear-gradient(135deg, #833ab4, #fd1d1d, #fcb045); }
+    .link-icon.facebook { background: #1877F2; }
+    .link-icon.tiktok { background: #000000; border: 1px solid rgba(255,255,255,0.1); }
+    .link-icon.youtube { background: #FF0000; }
+    .link-icon.whatsapp { background: #25D366; }
+    .link-icon i { color: #fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+
+    .link-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .link-title {
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .link-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .link-arrow {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      transition: all var(--transition);
+      flex-shrink: 0;
+    }
+
+    .link-card:hover .link-arrow {
+      color: var(--text-primary);
+      transform: translateX(4px);
+    }
+
+    /* Navigation buttons */
+    .nav-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 32px;
+      margin-top: 8px;
+      background: var(--glass-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all var(--transition);
+      backdrop-filter: blur(10px);
+      letter-spacing: 0.5px;
+      width: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .nav-button:hover {
+      background: var(--glass-hover);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-button:active {
+      transform: scale(0.98);
+    }
+
+    .nav-button.primary {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(236, 72, 153, 0.15));
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .nav-button.primary:hover {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(236, 72, 153, 0.25));
+      border-color: rgba(99, 102, 241, 0.5);
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+    }
+
+    /* Loading Screen */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-primary);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+      padding: 20px;
+    }
+
+    .loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loading-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    /* Loader */
+    .loader-container {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+
+    .loader {
+      position: absolute;
+      inset: 0;
+      border: 3px solid rgba(255, 255, 255, 0.06);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loader-2 {
+      inset: 10px;
+      border-top-color: rgba(99, 102, 241, 0.6);
+      animation: spin 1.5s linear infinite reverse;
+    }
+
+    .loader-3 {
+      inset: 20px;
+      border-top-color: rgba(236, 72, 153, 0.6);
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Typing */
+    .typing-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      text-align: center;
+    }
+
+    .tag-text {
+      font-family: 'Space Grotesk', monospace;
+      font-size: clamp(0.95rem, 3.5vw, 1.15rem);
+      letter-spacing: 1.5px;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(15px);
+      background: linear-gradient(90deg, #fff, #a1a1aa, #fff, #71717a, #fff);
+      background-size: 300% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: silverShine 4s linear infinite, fadeUp 0.6s forwards;
+    }
+
+    .tag-text:nth-child(1) { animation-delay: 0.1s, 0.1s; }
+    .tag-text:nth-child(2) { animation-delay: 0s, 0.4s; }
+    .tag-text:nth-child(3) { animation-delay: 0s, 0.7s; }
+    .tag-text:nth-child(4) { animation-delay: 0s, 1s; }
+    .tag-text:nth-child(5) { animation-delay: 0s, 1.3s; }
+
+    @keyframes silverShine {
+      0% { background-position: 0% center; }
+      100% { background-position: 300% center; }
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Start button */
+    .start-button {
+      margin-top: 10px;
+      padding: 14px 40px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 100px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all var(--transition);
+      color: #fff;
+      backdrop-filter: blur(4px);
+      letter-spacing: 1.5px;
+      animation: fadeUp 0.6s 1.6s forwards;
+      opacity: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .start-button:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.4);
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+    }
+
+    .start-button:active {
+      transform: scale(0.97);
+    }
+
+    .start-button i {
+      animation: bounceDown 2s ease-in-out infinite;
+    }
+
+    @keyframes bounceDown {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(4px); }
+    }
+
+    /* Page transitions */
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .page.entering {
+      animation: pageEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes pageEnter {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 20px 0 10px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+    }
+
+    .footer i {
+      color: #ec4899;
+      animation: heartbeat 1.5s ease-in-out infinite;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    /* Music toggle */
+    .music-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: all var(--transition);
+      z-index: 100;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .music-toggle:hover {
+      background: var(--glass-hover);
+      transform: scale(1.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .music-toggle.playing i {
+      animation: musicPulse 1s ease-in-out infinite;
+    }
+
+    @keyframes musicPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    /* Scroll indicator */
+    .scroll-hint {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      z-index: 50;
+      animation: fadeInOut 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .scroll-hint .mouse {
+      width: 22px;
+      height: 34px;
+      border: 1.5px solid var(--text-muted);
+      border-radius: 12px;
+      position: relative;
+    }
+
+    .scroll-hint .mouse::after {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 3px;
+      height: 6px;
+      background: var(--text-muted);
+      border-radius: 2px;
+      animation: scrollWheel 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollWheel {
+      0%, 100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      50% { opacity: 0.3; transform: translateX(-50%) translateY(8px); }
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      body { padding: 12px; }
+      .profile-card { padding: 32px 24px; }
+      .bio-card { padding: 24px 20px; }
+      .bio-text { padding-left: 0; font-size: 0.88rem; }
+      .bio-heading { font-size: 0.98rem; }
+      .profile-image-wrapper { width: 120px; height: 120px; }
+      .link-card { padding: 14px 16px; gap: 14px; }
+      .link-icon { width: 40px; height: 40px; font-size: 1.15rem; }
+      .link-title { font-size: 0.9rem; }
+      .scroll-hint { display: none; }
+      .music-toggle { bottom: 16px; right: 16px; width: 44px; height: 44px; }
+    }
+
+    @media (max-width: 380px) {
+      .profile-image-wrapper { width: 100px; height: 100px; }
+      .profile-card { padding: 24px 16px; }
+      .bio-card { padding: 20px 16px; }
+      .link-card { padding: 12px 14px; gap: 12px; }
+      .link-icon { width: 36px; height: 36px; font-size: 1rem; }
+      .link-subtitle { display: none; }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .orb { display: none; }
+    }
+
+    /* High contrast */
+    @media (prefers-contrast: high) {
+      :root {
+        --glass-bg: rgba(255, 255, 255, 0.1);
+        --glass-border: rgba(255, 255, 255, 0.3);
+        --text-secondary: rgba(255, 255, 255, 0.95);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Audio -->
+  <audio id="bg-music" src="song.mp3" loop preload="none"></audio>
+
+  <!-- Background -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <div class="noise-overlay" aria-hidden="true"></div>
+
+  <!-- Loading Screen -->
+  <div id="loading-screen" class="loading-screen" role="dialog" aria-label="Loading">
+    <div class="loading-content">
+      <div class="loader-container">
+        <div class="loader"></div>
+        <div class="loader loader-2"></div>
+        <div class="loader loader-3"></div>
+      </div>
+      <div class="typing-container">
+        <div class="tag-text">RIZKY NUR ALIEF</div>
+        <div class="tag-text">&lt; Graphic Design . &gt;</div>
+        <div class="tag-text">&lt; Video Editor . &gt;</div>
+        <div class="tag-text">&lt; Digital Creator . &gt;</div>
+        <div class="tag-text">&lt; Entrepreneur . &gt;</div>
+      </div>
+      <button id="start-btn" class="start-button" aria-label="Tap to start">
+        <span>TAP TO START</span>
+        <i class="fas fa-arrow-down"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="container" id="main-content" style="display: none;">
+
+    <!-- PAGE 1 -->
+    <div class="page active" id="page-1">
+      <!-- Profile Card -->
+      <section class="glass-card profile-card" aria-label="Profile">
+        <div class="profile-image-wrapper">
+          <div class="profile-image-ring"></div>
+          <div class="profile-image">
+            <img src="profile.jpg" alt="Rizky Nur Alief profile photo" loading="lazy">
+          </div>
+        </div>
+        
+        <div class="status-badge">
+          <span class="status-dot"></span>
+          <span>Available for work</span>
+        </div>
+        
+        <h1 class="name-title">RIZKY NUR ALIEF</h1>
+        <p class="tagline">Creative Professional &amp; Digital Storyteller</p>
+        
+        <div class="skill-tags">
+          <span class="skill-tag">🎨 Graphic Design</span>
+          <span class="skill-tag">🎬 Video Editor</span>
+          <span class="skill-tag">✨ Content Creator</span>
+          <span class="skill-tag">🚀 Entrepreneur</span>
+        </div>
+      </section>
+
+      <!-- Bio Card -->
+      <section class="glass-card bio-card" aria-label="About">
+        <div class="bio-section">
+          <div class="bio-heading">
+            <div class="icon-wrap"><i class="fas fa-quote-left"></i></div>
+            <span>About Me</span>
+          </div>
+          <p class="bio-text">
+            A creative professional with a deep passion for visual storytelling. Drawing on my experience as an editor in the marketing industry, I combine technical expertise, strong narrative structure, and visual sensibility to craft engaging and impactful short-form video content.
+          </p>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="bio-section">
+          <div class="bio-heading">
+            <div class="icon-wrap"><i class="fas fa-palette"></i></div>
+            <span>Graphic Design &amp; Video Editor</span>
+          </div>
+          <p class="bio-text">
+            Experienced in managing the entire post-production process for digital campaigns. I structure compelling narratives for short-form video content—such as Instagram Reels—employing strong storytelling techniques to maximize audience retention and align every visual with marketing strategy.
+          </p>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="bio-section">
+          <div class="bio-heading">
+            <div class="icon-wrap"><i class="fas fa-rocket"></i></div>
+            <span>Digital Creator</span>
+          </div>
+          <p class="bio-text">
+            From crafting captivating hooks to delivering impactful resolutions, I create content that is entertaining, empowering, and meaningful. Let's build something extraordinary together. ✨
+          </p>
+        </div>
+
+        <button id="nextBtn" class="nav-button primary" style="margin-top: 24px;">
+          <span>Connect With Me</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </section>
+
+      <footer class="footer">
+        <p>Made with <i class="fas fa-heart"></i> by Rizky Nur Alief</p>
+      </footer>
+    </div>
+
+    <!-- PAGE 2 -->
+    <div class="page" id="page-2">
+      <section class="glass-card profile-card" style="padding: 24px; margin-bottom: 20px;" aria-label="Social links header">
+        <h2 class="name-title" style="font-size: 1.4rem; margin-bottom: 4px;">Let's Connect</h2>
+        <p class="tagline" style="margin-bottom: 0;">Find me on these platforms</p>
+      </section>
+
+      <div class="links-container">
+        <a href="https://www.instagram.com/" class="link-card" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+          <div class="link-icon instagram"><i class="fab fa-instagram"></i></div>
+          <div class="link-content">
+            <div class="link-title">Instagram</div>
+            <div class="link-subtitle">@rizkynuralief</div>
+          </div>
+          <i class="fas fa-arrow-up-right-from-square link-arrow"></i>
+        </a>
+
+        <a href="https://www.facebook.com" class="link-card" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+          <div class="link-icon facebook"><i class="fab fa-facebook-f"></i></div>
+          <div class="link-content">
+            <div class="link-title">Facebook</div>
+            <div class="link-subtitle">Rizky Nur Alief</div>
+          </div>
+          <i class="fas fa-arrow-up-right-from-square link-arrow"></i>
+        </a>
+
+        <a href="https://www.tiktok.com/" class="link-card" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+          <div class="link-icon tiktok"><i class="fab fa-tiktok"></i></div>
+          <div class="link-content">
+            <div class="link-title">TikTok</div>
+            <div class="link-subtitle">@rizkynuralief</div>
+          </div>
+          <i class="fas fa-arrow-up-right-from-square link-arrow"></i>
+        </a>
+
+        <a href="https://youtube.com/" class="link-card" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+          <div class="link-icon youtube"><i class="fab fa-youtube"></i></div>
+          <div class="link-content">
+            <div class="link-title">YouTube</div>
+            <div class="link-subtitle">Subscribe for content</div>
+          </div>
+          <i class="fas fa-arrow-up-right-from-square link-arrow"></i>
+        </a>
+
+        <a href="https://wa.me/6289630063584" class="link-card" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp Business">
+          <div class="link-icon whatsapp"><i class="fab fa-whatsapp"></i></div>
+          <div class="link-content">
+            <div class="link-title">Business / Inquiries</div>
+            <div class="link-subtitle">Chat on WhatsApp</div>
+          </div>
+          <i class="fas fa-arrow-up-right-from-square link-arrow"></i>
+        </a>
+      </div>
+
+      <!-- Decorative second profile -->
+      <section class="glass-card profile-card" style="margin-top: 20px; padding: 20px;">
+        <div class="profile-image-wrapper" style="width: 100px; height: 100px;">
+          <div class="profile-image-ring"></div>
+          <div class="profile-image">
+            <img src="profile2.jpg" alt="Rizky Nur Alief secondary photo" loading="lazy">
+          </div>
+        </div>
+      </section>
+
+      <button id="backBtn" class="nav-button" style="margin-top: 16px;">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back to Profile</span>
+      </button>
+
+      <footer class="footer">
+        <p>© 2026 Rizky Nur Alief. All rights reserved.</p>
+      </footer>
+    </div>
+  </main>
+
+  <!-- Music toggle -->
+  <button id="music-toggle" class="music-toggle" aria-label="Toggle music" title="Toggle music">
+    <i class="fas fa-music"></i>
+  </button>
+
+  <!-- Scroll hint (page 1 only) -->
+  <div class="scroll-hint" id="scroll-hint" aria-hidden="true">
+    <div class="mouse"></div>
+    <span>Scroll</span>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // ===== Three.js Particle Background =====
+      let scene, camera, renderer, particles, mouseX = 0, mouseY = 0;
+      
+      function initThree() {
+        try {
+          const canvas = document.getElementById('bg-canvas');
+          scene = new THREE.Scene();
+          camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+          renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+          
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+          
+          const particleCount = 3500;
+          const positions = new Float32Array(particleCount * 3);
+          const colors = new Float32Array(particleCount * 3);
+          
+          const color1 = new THREE.Color('#6366f1');
+          const color2 = new THREE.Color('#ec4899');
+          const color3 = new THREE.Color('#06b6d4');
+          
+          for (let i = 0; i < particleCount * 3; i += 3) {
+            positions[i] = (Math.random() - 0.5) * 8;
+            positions[i + 1] = (Math.random() - 0.5) * 8;
+            positions[i + 2] = (Math.random() - 0.5) * 8;
+            
+            const rand = Math.random();
+            let color;
+            if (rand < 0.33) color = color1;
+            else if (rand < 0.66) color = color2;
+            else color = color3;
+            
+            colors[i] = color.r;
+            colors[i + 1] = color.g;
+            colors[i + 2] = color.b;
+          }
+          
+          const geo = new THREE.BufferGeometry();
+          geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+          geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+          
+          const mat = new THREE.PointsMaterial({
+            size: 0.012,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.7,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false,
+            sizeAttenuation: true
+          });
+          
+          particles = new THREE.Points(geo, mat);
+          scene.add(particles);
+          camera.position.z = 3;
+          
+          document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth) - 0.5;
+            mouseY = (e.clientY / window.innerHeight) - 0.5;
+          }, { passive: true });
+          
+          // Touch support
+          document.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+              mouseX = (e.touches[0].clientX / window.innerWidth) - 0.5;
+              mouseY = (e.touches[0].clientY / window.innerHeight) - 0.5;
+            }
+          }, { passive: true });
+          
+          animateParticles();
+        } catch (err) {
+          console.warn('Three.js init failed:', err);
+          document.body.style.background = 'var(--bg-primary)';
+        }
+      }
+      
+      function animateParticles() {
+        if (!renderer) return;
+        requestAnimationFrame(animateParticles);
+        particles.rotation.y += 0.0006;
+        particles.rotation.x += 0.0003;
+        camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.03;
+        camera.position.y += (-mouseY * 0.5 - camera.position.y) * 0.03;
+        renderer.render(scene, camera);
+      }
+      
+      window.addEventListener('resize', () => {
+        if (!renderer) return;
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      }, { passive: true });
+
+      // ===== UI Logic =====
+      const startBtn = document.getElementById('start-btn');
+      const loadingScreen = document.getElementById('loading-screen');
+      const mainContent = document.getElementById('main-content');
+      const page1 = document.getElementById('page-1');
+      const page2 = document.getElementById('page-2');
+      const nextBtn = document.getElementById('nextBtn');
+      const backBtn = document.getElementById('backBtn');
+      const music = document.getElementById('bg-music');
+      const musicToggle = document.getElementById('music-toggle');
+      const scrollHint = document.getElementById('scroll-hint');
+      
+      let musicPlaying = false;
+      
+      // Start
+      startBtn.addEventListener('click', () => {
+        // Try to play music
+        music.play().then(() => {
+          musicPlaying = true;
+          musicToggle.classList.add('playing');
+        }).catch(() => {
+          // Autoplay blocked - user can toggle manually
+          musicPlaying = false;
+        });
+        
+        loadingScreen.classList.add('hidden');
+        mainContent.style.display = 'block';
+        
+        // Trigger page 1 animation
+        page1.classList.add('entering');
+        
+        setTimeout(() => {
+          loadingScreen.style.display = 'none';
+        }, 800);
+      });
+      
+      // Navigation
+      function switchPage(from, to) {
+        from.classList.remove('active', 'entering');
+        to.classList.add('active');
+        // Force reflow then add entering
+        void to.offsetWidth;
+        to.classList.add('entering');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      
+      nextBtn.addEventListener('click', () => {
+        switchPage(page1, page2);
+        if (scrollHint) scrollHint.style.display = 'none';
+      });
+      
+      backBtn.addEventListener('click', () => {
+        switchPage(page2, page1);
+        if (scrollHint) scrollHint.style.display = 'flex';
+      });
+      
+      // Music toggle
+      musicToggle.addEventListener('click', () => {
+        if (musicPlaying) {
+          music.pause();
+          musicPlaying = false;
+          musicToggle.classList.remove('playing');
+        } else {
+          music.play().then(() => {
+            musicPlaying = true;
+            musicToggle.classList.add('playing');
+          }).catch(() => {
+            musicPlaying = false;
+          });
+        }
+      });
+      
+      // Keyboard navigation
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' && page1.classList.contains('active')) {
+          nextBtn.click();
+        } else if (e.key === 'ArrowLeft' && page2.classList.contains('active')) {
+          backBtn.click();
+        }
+      });
+      
+      // Prevent context menu on images
+      document.querySelectorAll('img').forEach(img => {
+        img.addEventListener('contextmenu', (e) => e.preventDefault());
+      });
+      
+      // Init Three.js
+      initThree();
+      
+      // Hide scroll hint after scroll on page 1
+      if (scrollHint) {
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 50 && page1.classList.contains('active')) {
+            scrollHint.style.opacity = '0';
+            scrollHint.style.transition = 'opacity 0.5s';
+          }
+        }, { passive: true });
+      }
+      
+    })();
+  </script>
+</body>
+</html>
